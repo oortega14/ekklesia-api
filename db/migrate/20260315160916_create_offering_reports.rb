@@ -2,7 +2,7 @@ class CreateOfferingReports < ActiveRecord::Migration[8.1]
   def change
     create_table :offering_reports do |t|
       t.references :organization,  null: false, foreign_key: true
-      t.references :service,       null: false, foreign_key: true
+      t.references :service,       null: false, foreign_key: true, index: { unique: true }
       t.references :submitted_by,
                    null: false, foreign_key: { to_table: :users }
       t.references :responsible_pastor,
@@ -27,7 +27,6 @@ class CreateOfferingReports < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :offering_reports, :service_id, unique: true
     add_index :offering_reports, [ :organization_id, :status ]
     add_index :offering_reports, :submitted_at
   end
