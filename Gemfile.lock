@@ -75,10 +75,13 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    acts_as_tenant (1.0.1)
+      rails (>= 6.0)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     base64 (0.3.0)
+    bcrypt (3.1.21)
     bcrypt_pbkdf (1.1.2)
     bigdecimal (4.0.1)
     bootsnap (1.23.0)
@@ -129,6 +132,8 @@ GEM
     json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
+    jwt (2.10.2)
+      base64
     kamal (2.10.1)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -209,9 +214,14 @@ GEM
     public_suffix (7.0.5)
     puma (7.2.0)
       nio4r (~> 2.0)
+    pundit (2.5.2)
+      activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.2.5)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -346,14 +356,19 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  acts_as_tenant (~> 1.0)
+  bcrypt (~> 3.1.7)
   bootsnap
   brakeman
   bundler-audit
   debug
   image_processing (~> 1.2)
+  jwt (~> 2.9)
   kamal
   pg (~> 1.1)
   puma (>= 5.0)
+  pundit (~> 2.4)
+  rack-cors
   rails (~> 8.1.2)
   rubocop-rails-omakase
   solid_cable
@@ -375,9 +390,11 @@ CHECKSUMS
   activerecord (8.1.2) sha256=acfbe0cadfcc50fa208011fe6f4eb01cae682ebae0ef57145ba45380c74bcc44
   activestorage (8.1.2) sha256=8a63a48c3999caeee26a59441f813f94681fc35cc41aba7ce1f836add04fba76
   activesupport (8.1.2) sha256=88842578ccd0d40f658289b0e8c842acfe9af751afee2e0744a7873f50b6fdae
+  acts_as_tenant (1.0.1) sha256=6944e4d64533337938a8817a6b4ff9b11189c9dcc0b1333bb89f3821a4c14c53
   addressable (2.8.9) sha256=cc154fcbe689711808a43601dee7b980238ce54368d23e127421753e46895485
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
+  bcrypt (3.1.21) sha256=5964613d750a42c7ee5dc61f7b9336fb6caca429ba4ac9f2011609946e4a2dcf
   bcrypt_pbkdf (1.1.2) sha256=c2414c23ce66869b3eb9f643d6a3374d8322dfb5078125c82792304c10b94cf6
   bigdecimal (4.0.1) sha256=8b07d3d065a9f921c80ceaea7c9d4ae596697295b584c296fe599dd0ad01c4a7
   bootsnap (1.23.0) sha256=c1254f458d58558b58be0f8eb8f6eec2821456785b7cdd1e16248e2020d3f214
@@ -409,6 +426,7 @@ CHECKSUMS
   irb (1.17.0) sha256=168c4ddb93d8a361a045c41d92b2952c7a118fa73f23fe14e55609eb7a863aae
   json (2.19.1) sha256=dd94fdc59e48bff85913829a32350b3148156bc4fd2a95a2568a78b11344082d
   json-schema (6.2.0) sha256=e8bff46ed845a22c1ab2bd0d7eccf831c01fe23bb3920caa4c74db4306813666
+  jwt (2.10.2) sha256=31e1ee46f7359883d5e622446969fe9c118c3da87a0b1dca765ce269c3a0c4f4
   kamal (2.10.1) sha256=53b7ecb4c33dd83b1aedfc7aacd1c059f835993258a552d70d584c6ce32b6340
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
@@ -449,9 +467,11 @@ CHECKSUMS
   psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (7.2.0) sha256=bf8ef4ab514a4e6d4554cb4326b2004eba5036ae05cf765cfe51aba9706a72a8
+  pundit (2.5.2) sha256=e374152baa24f90b630428293faf4b4c5468fc3cc010165f7d8fcb44ce108bbd
   raabro (1.4.0) sha256=d4fa9ff5172391edb92b242eed8be802d1934b1464061ae5e70d80962c5da882
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.5) sha256=4cbd0974c0b79f7a139b4812004a62e4c60b145cba76422e288ee670601ed6d3
+  rack-cors (3.0.0) sha256=7b95be61db39606906b61b83bd7203fa802b0ceaaad8fcb2fef39e097bf53f68
   rack-session (2.1.1) sha256=0b6dc07dea7e4b583f58a48e8b806d4c9f1c6c9214ebc202ec94562cbea2e4e9
   rack-test (2.2.0) sha256=005a36692c306ac0b4a9350355ee080fd09ddef1148a5f8b2ac636c720f5c463
   rackup (2.3.1) sha256=6c79c26753778e90983761d677a48937ee3192b3ffef6bc963c0950f94688868
