@@ -8,11 +8,12 @@ class ApplicationController < ActionController::API
   private
 
   def set_tenant
-    # super_admin no necesita tenant
-    return if current_user&.super_admin?
+    tenant_id = current_user_payload&.dig(:org)
 
-    tenant = request.env["ekklesia.tenant"] ||
-             Organization.find_by(id: current_user_payload&.dig(:org))
+    # Super admin sin org en el token → sin tenant (vista global)
+    return if current_user&.super_admin? && tenant_id.nil?
+
+    tenant = Organization.find_by(id: tenant_id)
 
     if tenant.nil?
       render json: { error: "Organización no encontrada" }, status: :not_found

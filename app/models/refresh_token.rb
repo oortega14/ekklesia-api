@@ -10,15 +10,16 @@ class RefreshToken < ApplicationRecord
       .where("expires_at > ?", Time.current)
   }
 
-  def self.generate_for(user, device_info = {})
+  def self.generate_for(user, device_info = {}, organization: nil)
     raw_token = SecureRandom.urlsafe_base64(64)
     hmac      = OpenSSL::HMAC.hexdigest("SHA256", hmac_secret, raw_token)
 
     record = create!(
+      jti:          SecureRandom.uuid,
       token_digest: BCrypt::Password.create(raw_token),
       token_hmac:   hmac,
       user:            user,
-      organization:    user.organization,
+      organization:    organization || user.organization,
       expires_at:      30.days.from_now,
       device_name:     device_info[:device_name],
       ip_address:      device_info[:ip_address],

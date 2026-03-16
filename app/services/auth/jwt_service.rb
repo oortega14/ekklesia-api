@@ -6,10 +6,10 @@ module Auth
 
     ALGORITHM = "HS256".freeze
 
-    def self.encode_access_token(user)
+    def self.encode_access_token(user, org_id: user.organization_id)
       payload = {
         sub:   user.id,
-        org:   user.organization_id,
+        org:   org_id,
         role:  user.role,
         jti:   SecureRandom.uuid,
         iat:   Time.current.to_i,

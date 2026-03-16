@@ -41,15 +41,31 @@ module Auth
       # Rotación — revoca el viejo, emite uno nuevo
       record.revoke!(reason: "rotated")
       user = record.user
+      impersonated_org = record.organization
 
-      new_access        = JwtService.encode_access_token(user)
-      new_refresh_data  = RefreshToken.generate_for(user)
+      new_access       = JwtService.encode_access_token(user, org_id: impersonated_org&.id)
+      new_refresh_data = RefreshToken.generate_for(user, {}, organization: impersonated_org)
 
       Result.new(
         success?:      true,
         user:          user,
         access_token:  new_access,
         refresh_token: new_refresh_data[:raw_token]
+      )
+    end
+
+    def self.impersonate(user:, organization_id:, device_info: {})
+      org = Organization.find_by(id: organization_id)
+      return Result.new(success?: false, error: "Organización no encontrada") unless org
+
+      access_token       = JwtService.encode_access_token(user, org_id: org.id)
+      refresh_token_data = RefreshToken.generate_for(user, device_info, organization: org)
+
+      Result.new(
+        success?:      true,
+        user:          user,
+        access_token:  access_token,
+        refresh_token: refresh_token_data[:raw_token]
       )
     end
 
