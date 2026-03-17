@@ -12,6 +12,9 @@ Rails.application.routes.draw do
       end
 
       resources :organizations, only: [ :index ]
+      resources :churches
+      resources :pastors
+      resources :members
     end
   end
 end

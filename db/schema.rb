@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_15_160949) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_16_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,9 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_160949) do
 
   create_table "churches", force: :cascade do |t|
     t.text "address_line"
-    t.integer "capacity"
     t.string "city"
-    t.string "code"
     t.string "country_code", null: false
     t.datetime "created_at", null: false
     t.string "email"
@@ -103,7 +101,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_160949) do
     t.datetime "updated_at", null: false
     t.index ["latitude", "longitude"], name: "index_churches_on_latitude_and_longitude"
     t.index ["lead_pastor_id"], name: "index_churches_on_lead_pastor_id"
-    t.index ["organization_id", "code"], name: "index_churches_on_organization_id_and_code", unique: true, where: "(code IS NOT NULL)"
     t.index ["organization_id", "status"], name: "index_churches_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_churches_on_organization_id"
   end
@@ -128,6 +125,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_160949) do
     t.index ["organization_id"], name: "index_delegations_on_organization_id"
     t.index ["revoked_by_id"], name: "index_delegations_on_revoked_by_id"
     t.index ["steward_id"], name: "index_delegations_on_steward_id"
+  end
+
+  create_table "members", force: :cascade do |t|
+    t.string "avatar_url"
+    t.bigint "church_id", null: false
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "first_name", null: false
+    t.date "joined_on"
+    t.string "last_name", null: false
+    t.bigint "organization_id", null: false
+    t.string "phone"
+    t.string "role", default: "member", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["church_id"], name: "index_members_on_church_id"
+    t.index ["email"], name: "index_members_on_email"
+    t.index ["organization_id", "church_id"], name: "index_members_on_organization_id_and_church_id"
+    t.index ["organization_id", "status"], name: "index_members_on_organization_id_and_status"
+    t.index ["organization_id"], name: "index_members_on_organization_id"
   end
 
   create_table "membership_snapshots", force: :cascade do |t|
@@ -292,6 +309,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_15_160949) do
   add_foreign_key "delegations", "users", column: "delegator_id"
   add_foreign_key "delegations", "users", column: "revoked_by_id"
   add_foreign_key "delegations", "users", column: "steward_id"
+  add_foreign_key "members", "churches"
+  add_foreign_key "members", "organizations"
   add_foreign_key "membership_snapshots", "churches"
   add_foreign_key "membership_snapshots", "organizations"
   add_foreign_key "offering_reports", "organizations"

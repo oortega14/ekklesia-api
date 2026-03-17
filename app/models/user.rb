@@ -8,6 +8,8 @@ class User < ApplicationRecord
 
   belongs_to :organization, optional: true  # super_admin no tiene
   has_one    :pastor_profile, dependent: :destroy
+  has_many   :church_pastors, dependent: :destroy
+  has_many   :churches, through: :church_pastors
   has_many   :refresh_tokens, dependent: :destroy
 
   # Como delegator (pastor que delega)
